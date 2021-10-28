@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+            integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+        <link href="https://unpkg.com/cirrus-ui" type="text/css" rel="stylesheet"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+        <title>Nishank Gujar Quiz 6</title>
+        <style>
+            form{
+            padding: 1rem 1rem 1rem 1rem;
+            margin: 1rem 1rem 1rem 1rem;
+            width: 100%;
+            height: fit-content;
+            justify-content: center;
+            }
+
+        input{
+            width: 10rem;
+        }
+
+        .chatbox {
+            border: 3px solid teal;
+            justify-content: center;
+            padding: 2rem 2rem 2rem 2rem;
+            height: auto;
+            width: auto;
+            text-align: center;
+        }
+        .main{
+            display: flex;
+            flex-direction: row;
+        }
+
+        .main > div{
+            margin: 5rem;
+        }
+
+
+        .game-board{
+	        width: 500px;
+	        height: 500px;
+	        margin: 0 auto;
+            color: black;
+            border: 3px solid teal;
+            border-radius: 5px;
+	
+	        display: grid;
+	        grid-template: repeat(2, 1fr) / repeat(2, 1fr);
+        }
+
+        .box{
+            border: 6px solid teal;
+            border-radius: 2px;
+            font-family: Helvetica;
+            font-weight: bold;
+            font-size: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        </style>
+    </head>
+<body>
+    <h1 style="text-align: center;">Student ID : 1001861756</h1>
+    <h1 style="text-align: center;">Name : Nishank Gujar</h1>
+    <hr>
+    <br>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script>
+        const socket = io.connect("http://18.191.9.226:8080")
+
+        socket.on('connect', () => {
+            socket.emit('join_room', {
+                username: "{{username}}",
+                room: "{{room}}",
+                option: "{{option}}"
+            });
+
+            let message_input = document.getElementById('message_input')
+
+            document.getElementById('message_input_form').onsubmit = (e) => {
+                e.preventDefault();
+                let message = message_input.value.trim()
+                if (message.length) {
+                    socket.emit('send_message', {
+                        username: "{{username}}",
+                        room: "{{room}}",
+                        message: message
+                    })
+                    message_input.value = '';
+                    message_input.focus();
+                }
+            }
+
+        });
+
+
+        socket.on('recieve_message', (data) => {
+            console.log(data)
+            const newNode = document.createElement('div')
+            newNode.innerHTML = `<b>${data.username}: &nbsp</b> ${data.message}<hr>`
+            document.getElementById('messages').appendChild(newNode)
+        });
+
+        socket.on('join_room_announcement', (data) => {
+            console.log(data)
+            const newNode = document.createElement('div')
+            newNode.innerHTML = `<b>${data.username}</b> has joined the room as <b>${data.option}</b>`
+            document.getElementById('messages').appendChild(newNode)
+        });
+    </script>
+    
+    <div class="game-board">
+        <div class="box">X</div>
+        <div class="box">O</div>
+        <div class="box">O</div>
+        <div class="box">X</div>
+    </div>
+
+    <section class="main">
+        <div>
+    <form id="message_input_form">
+        <h4>Room #{{room}}</h4>
+        <input type="text" id="message_input" placeholder="Enter your message"> 
+        <br><br>
+        <input type="submit" value="submit" class="btn-primary">
+    </form>
+    </div>  
+
+    <div id="messages" class="chatbox">
+
+    </div>
+
+    </section>
+</body>
+</html>
